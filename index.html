@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HSK4 Dictionary</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    input { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 20px; }
+    li { margin: 5px 0; padding: 5px; background: #fff; list-style: none; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>HSK4 Dictionary</h1>
+  <input type="text" id="search" placeholder="Search Chinese, Pinyin, or English">
+  <ul id="results"></ul>
+
+  <script>
+    let words = [];
+
+    // Load the JSON file
+    fetch('words.json')
+      .then(response => response.json())
+      .then(data => words = data)
+      .catch(err => console.error("Error loading words.json:", err));
+
+    const searchInput = document.getElementById('search');
+    const resultsList = document.getElementById('results');
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase().trim();
+      resultsList.innerHTML = '';
+
+      if (query === "") return;
+
+      const results = words.filter(word => 
+        word.chinese.includes(query) ||
+        word.pinyin.toLowerCase().includes(query) ||
+        word.english.toLowerCase().includes(query)
+      );
+
+      results.forEach(word => {
+        const li = document.createElement('li');
+        li.textContent = `${word.chinese} (${word.pinyin}) - ${word.english}`;
+        resultsList.appendChild(li);
+      });
+
+      if (results.length === 0) {
+        resultsList.innerHTML = '<li>No results found</li>';
+      }
+    });
+  </script>
+</body>
+</html>
