@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HSK4 Dictionary</title>
+  <style>
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      margin: 0; 
+      padding: 0; 
+      background: linear-gradient(to right, #e0f7fa, #fff9c4); 
+      color: #333; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 { 
+      color: #4b2e83; 
+      margin: 40px 0 20px 0;
+      font-size: 2em;
+      text-align: center;
+    }
+
+    input { 
+      width: 90%; 
+      max-width: 600px;
+      padding: 14px 20px; 
+      font-size: 18px; 
+      margin-bottom: 30px; 
+      border: 2px solid #4b2e83; 
+      border-radius: 12px;
+      background-color: #fff;
+      color: #4b2e83;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #a96eff;
+      box-shadow: 2px 2px 12px rgba(169,110,255,0.3);
+      outline: none;
+    }
+
+    ul { 
+      list-style: none; 
+      padding: 0; 
+      width: 90%; 
+      max-width: 600px;
+    }
+
+    li { 
+      margin: 10px 0; 
+      padding: 15px 20px; 
+      background: #ffffff; 
+      border-radius: 16px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      font-size: 18px;
+    }
+
+    li:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .chinese { color: #6a1b9a; font-weight: bold; margin-right: 10px; }
+    .pinyin { color: #1e88e5; font-style: italic; margin-right: 10px; }
+    .english { color: #2e7d32; }
+    
+    /* Responsive */
+    @media (max-width: 500px){
+      li { font-size: 16px; padding: 12px 16px; }
+      input { font-size: 16px; padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>HSK4 Dictionary</h1>
+  <input type="text" id="search" placeholder="Search Chinese, Pinyin, or English">
+  <ul id="results"></ul>
+
+  <script>
+    let words = [];
+
+    fetch('words.json')
+      .then(response => response.json())
+      .then(data => words = data)
+      .catch(err => console.error("Error loading words.json:", err));
+
+    const searchInput = document.getElementById('search');
+    const resultsList = document.getElementById('results');
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase().trim();
+      resultsList.innerHTML = '';
+
+      if (query === "") return;
+
+      const results = words.filter(word => 
+        word.chinese.includes(query) ||
+        word.pinyin.toLowerCase().includes(query) ||
+        word.english.toLowerCase().includes(query)
+      );
+
+      results.forEach(word => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="chinese">${word.chinese}</span> <span class="pinyin">(${word.pinyin})</span> <span class="english">- ${word.english}</span>`;
+        resultsList.appendChild(li);
+      });
+
+      if (results.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = "No results found";
+        resultsList.appendChild(li);
+      }
+    });
+  </script>
+</body>
+</html>
